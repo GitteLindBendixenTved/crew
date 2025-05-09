@@ -1,2 +1,5 @@
 fastapi
 uvicorn
+crewai
+openai
+python-dotenv
