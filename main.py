@@ -5,14 +5,9 @@ from crewai import Agent, Crew
 import openai
 import os
 
-
-# Henter din OpenAI API-nøgle fra Render Environment
-
-openai.api_key = os.getenv("OPENAIDAPI")
-
 app = FastAPI()
 
-# CORS-konfiguration: kun tillad fra din WordPress-side
+# CORS setup: allow access from https://bussin.tech
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://bussin.tech"],
@@ -21,11 +16,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Monter statiske filer (fx widget.js)
+# OpenAI API key
+openai.api_key = os.getenv("OPENAIDAPI")
+
+# Static files (for widget.js)
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-# AI-endpoint
+# AI content generation endpoint
 @app.post("/generate")
 async def generate_content(request: Request):
     data = await request.json()
