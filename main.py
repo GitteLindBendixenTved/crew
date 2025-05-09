@@ -2,10 +2,15 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
+from crewai import Agent, Crew
+import openai
+
+# Henter din OpenAI API-nøgle fra Render Environment
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
 
-# CORS configuration to allow requests from https://bussin.tech
+# CORS-konfiguration: kun tillad fra din WordPress-side
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://bussin.tech"],
@@ -14,11 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static folder for widget.js
-current_dir = os.path.dirname(__file__)
-static_dir = os.path.join(current_dir, "static")
+# Monter statiske filer (fx widget.js)
+static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
+# AI-endpoint
 @app.post("/generate")
 async def generate_content(request: Request):
     data = await request.json()
@@ -26,12 +31,20 @@ async def generate_content(request: Request):
     industry = data.get("industry", "en branche")
     tone = data.get("tone", "professionel")
 
-    result = f"""🧠 Genereret indhold til {company} ({industry}) i tone: {tone}
+    writer = Agent(
+        role="Content Writer",
+        goal="Skriv detaljeret og engagerende marketingindhold",
+        backstory="Du er ekspert i branding, storytelling og SoMe-tekster. Skriv med overbevisning, klarhed og dybde.",
+        verbose=False
+    )
 
-📄 Blogindlæg:
-Hvordan {company} revolutionerer {industry}-branchen i 2024…
+    crew = Crew(
+        agents=[writer],
+        tasks=[{
+            "agent": writer,
+            "description": f"Skriv et langt blogindlæg og 2 kreative SoMe-opslag for virksomheden '{company}', som arbejder i '{industry}'-branchen. Skriv i en {tone} tone. Indholdet skal være engagerende og rigt på konkrete formuleringer, ikke floskler."
+        }]
+    )
 
-📣 SoMe-opslag:
-🚀 Hos {company} gør vi {industry} nemt, smart og effektivt!"""
-
+    result = crew.run()
     return {"result": result}
