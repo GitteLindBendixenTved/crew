@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     resultEl.textContent = "⏳ AI skriver...";
 
     try {
-      const response = await fetch('https://crews.onrender.com/generate', {
+      const response = await fetch('https://crew-v9ht.onrender.com/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
