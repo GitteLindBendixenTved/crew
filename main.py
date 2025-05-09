@@ -6,7 +6,8 @@ from crewai import Agent, Crew
 import openai
 
 # Henter din OpenAI API-nøgle fra Render Environment
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
+openai.api_key = os.getenv("OPENAIDAPI")
 
 app = FastAPI()
 
