@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import os
 from crewai import Agent, Crew
 import openai
+import os
+
 
 # Henter din OpenAI API-nøgle fra Render Environment
 
